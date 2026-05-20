@@ -24,6 +24,7 @@ async def signup(request: Request, user: UserCreate):
         "username": user.username,
         "password_hash": hash_password(user.password),
         "full_name": user.full_name,
+        "email": user.email,
         "created_at": now
     })
     token = create_access_token(data={"sub": uid})

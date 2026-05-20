@@ -59,24 +59,7 @@ function updateClocks() {
 setInterval(updateClocks, 10000);
 updateClocks();
 
-// --- Auth ---
 document.addEventListener('DOMContentLoaded', () => {
-    if (authToken) {
-        validateTokenAndLogin();
-    } else {
-        showLockScreen();
-    }
-
-    document.getElementById('show-signup')?.addEventListener('click', toggleSignupForm);
-    document.getElementById('show-login')?.addEventListener('click', toggleLoginForm);
-    document.getElementById('login-btn').addEventListener('click', loginHandler);
-    document.getElementById('signup-btn').addEventListener('click', signupHandler);
-
-    const lockScreen = document.getElementById('lock-screen');
-    lockScreen.addEventListener('click', () => {
-        document.getElementById('login-box').style.display = 'flex';
-    });
-
     // Desktop right‑click context menu actions
     const newFolderBtn = document.querySelector('[data-action="new-folder"]');
     if (newFolderBtn) {

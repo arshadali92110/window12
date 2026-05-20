@@ -6,6 +6,7 @@ class UserCreate(BaseModel):
     username: constr(min_length=3, max_length=30) 
     password: constr(min_length=6, max_length=72) 
     full_name: constr(min_length=1, max_length=50)
+    email: str = ""
 
 class TokenResponse(BaseModel):
     access_token: str
