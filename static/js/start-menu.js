@@ -29,6 +29,25 @@ function populateStartMenu() {
             closeStartMenu();
         });
         grid.appendChild(div);
+        div.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            const appName = app.app;
+            const menu = document.createElement('div');
+            menu.style.cssText = 'position:fixed; background:rgba(30,30,50,0.95); backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,0.2); border-radius:8px; padding:4px 0; z-index:8001; left:' + e.clientX + 'px; top:' + e.clientY + 'px;';
+            const pinItem = document.createElement('div');
+            pinItem.style.cssText = 'padding:8px 16px; cursor:pointer; color:#cbd5e1;';
+            pinItem.textContent = pinnedApps.includes(appName) ? 'Unpin from taskbar' : 'Pin to taskbar';
+            pinItem.addEventListener('click', () => {
+                if (pinnedApps.includes(appName)) unpinApp(appName);
+                else pinApp(appName);
+                menu.remove();
+            });
+            menu.appendChild(pinItem);
+            document.body.appendChild(menu);
+            document.addEventListener('click', function close(e) {
+                if (!menu.contains(e.target)) { menu.remove(); document.removeEventListener('click', close); }
+            });
+        });
     });
 }
 

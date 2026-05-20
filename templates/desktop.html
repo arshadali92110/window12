@@ -75,9 +75,9 @@
 
     <!-- TASKBAR -->
     <div id="taskbar">
+        <div class="taskbar-left" id="pinned-apps"></div>
         <div class="taskbar-left">
-            <!-- <button class="taskbar-btn" id="btn-taskview" title="Task View">⊞⊞</button> -->
-             <button class="taskbar-btn" id="btn-start" title="Start">⊞</button>
+            <button class="taskbar-btn" id="btn-start" title="Start">⊞</button>
             <button class="taskbar-btn" id="btn-search" title="Search">🔍</button>
             <button class="taskbar-btn" id="btn-widgets" title="Widgets">📋</button>
         </div>
@@ -109,25 +109,25 @@
     <div id="widgets-panel">
         <button class="widget-close" id="btn-widgets-close">✕</button>
         <h3>📋 Widgets</h3>
-        <div class="widget-card widget-weather">
-            <span class="weather-icon">☀️</span>
-            <div>
-                <div style="font-size:28px;font-weight:600;">72°F</div>
-                <div style="font-size:12px;color:#94a3b8;">Sunny · New York</div>
-            </div>
+    <div class="widget-card widget-weather">
+        <span class="weather-icon">☀️</span>
+        <div>
+            <div style="font-size:28px;font-weight:600;" class="weather-temp">72°F</div>
+            <div style="font-size:12px;color:#94a3b8;" class="weather-desc">Sunny · New York</div>
         </div>
-        <div class="widget-card">
-            <strong>📅 Calendar</strong>
-            <p style="margin-top:6px;">No upcoming events</p>
-        </div>
-        <div class="widget-card">
-            <strong>📈 Stocks</strong>
-            <p style="margin-top:6px;color:#34d399;">▲ S&P 500 +1.2%</p>
-        </div>
-        <div class="widget-card">
-            <strong>🗞️ News</strong>
-            <p style="margin-top:6px;">Latest headlines loading...</p>
-        </div>
+    </div>
+    <div class="widget-card widget-stocks">
+        <strong>📈 Stocks</strong>
+        <p style="margin-top:6px;" class="stock-val">▲ S&P 500 +1.2%</p>
+    </div>
+    <div class="widget-card widget-calendar">
+        <strong>📅 Calendar</strong>
+        <p style="margin-top:6px;" class="cal-text">Loading...</p>
+    </div>
+    <div class="widget-card">
+        <strong>🗞️ News</strong>
+        <p style="margin-top:6px;">Latest headlines loading...</p>
+    </div>
     </div>
 
     <!-- NOTIFICATION PANEL -->
@@ -168,6 +168,10 @@
     <script src="/static/js/settings-app.js"></script>
     <script src="/static/js/calculator-app.js"></script>
     <script src="/static/js/desktop.js"></script>
+    <script src="/static/js/desktop-icons.js"></script>
+    <script src="/static/js/taskbar-pins.js"></script>
+    <script src="/static/js/widgets.js"></script>
+    <script src="/static/js/system-tray.js"></script>
     <!-- app files -->
     <script src="/static/js/browser.js"></script>
     <script src="/static/js/terminal.js"></script>

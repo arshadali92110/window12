@@ -243,6 +243,10 @@ async function initBackendData() {
     await restoreWorkspaces();
     loadFilesIntoExplorerWindows();
     loadSettings();
+    loadIconPositions();
+    loadPinnedApps();
+    initWidgets();
+    initSystemTray();
     loadNotifications();
     loadInstalledApps();
 }
