@@ -20,34 +20,49 @@ function populateStartMenu() {
     const grid = document.getElementById('start-apps-grid');
     if (!grid) return;
     grid.innerHTML = '';
+
     startMenuApps.forEach(app => {
         const div = document.createElement('div');
         div.className = 'start-app-item';
         div.innerHTML = `<div class="app-icon" style="background:${app.color};color:#fff;">${app.icon}</div><div class="app-name">${app.name}</div>`;
+
+        // Left click → open app
         div.addEventListener('click', () => {
             openApp(app.app);
             closeStartMenu();
         });
-        grid.appendChild(div);
+
+        // Right click → pin/unpin
         div.addEventListener('contextmenu', (e) => {
             e.preventDefault();
-            const appName = app.app;
             const menu = document.createElement('div');
-            menu.style.cssText = 'position:fixed; background:rgba(30,30,50,0.95); backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,0.2); border-radius:8px; padding:4px 0; z-index:8001; left:' + e.clientX + 'px; top:' + e.clientY + 'px;';
+            menu.style.cssText = 'position:fixed; background:rgba(30,30,50,0.95); backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,0.2); border-radius:8px; padding:4px 0; z-index:9000; left:' + e.clientX + 'px; top:' + e.clientY + 'px; min-width:180px;';
+
+            const isPinned = typeof pinnedApps !== 'undefined' && pinnedApps.includes(app.app);
             const pinItem = document.createElement('div');
-            pinItem.style.cssText = 'padding:8px 16px; cursor:pointer; color:#cbd5e1;';
-            pinItem.textContent = pinnedApps.includes(appName) ? 'Unpin from taskbar' : 'Pin to taskbar';
+            pinItem.style.cssText = 'padding:8px 16px; cursor:pointer; color:#cbd5e1; font-size:13px;';
+            pinItem.textContent = isPinned ? '📌 Unpin from taskbar' : '📌 Pin to taskbar';
             pinItem.addEventListener('click', () => {
-                if (pinnedApps.includes(appName)) unpinApp(appName);
-                else pinApp(appName);
+                if (isPinned) {
+                    if (typeof unpinApp === 'function') unpinApp(app.app);
+                } else {
+                    if (typeof pinApp === 'function') pinApp(app.app);
+                }
                 menu.remove();
             });
             menu.appendChild(pinItem);
             document.body.appendChild(menu);
-            document.addEventListener('click', function close(e) {
-                if (!menu.contains(e.target)) { menu.remove(); document.removeEventListener('click', close); }
-            });
+
+            const closeMenu = (ev) => {
+                if (!menu.contains(ev.target)) {
+                    menu.remove();
+                    document.removeEventListener('click', closeMenu);
+                }
+            };
+            setTimeout(() => document.addEventListener('click', closeMenu), 0);
         });
+
+        grid.appendChild(div);
     });
 }
 

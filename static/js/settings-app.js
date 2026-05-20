@@ -59,16 +59,22 @@ function attachSettingsEvents(container) {
     const autoChk = document.getElementById('setting-taskbar-autohide');
 
     const save = async () => {
-        const payload = {
+        queueSettingsUpdate({
             wallpaper: wallpaperInp?.value,
             theme: themeSel?.value,
             transparency: transChk?.checked,
             accent_color: accentInp?.value,
             snap_enabled: snapChk?.checked,
             taskbar_autohide: autoChk?.checked
-        };
-        await api.put('/settings/', payload);
-        if (typeof applySettings === 'function') applySettings(payload);
+        });
+        if (typeof applySettings === 'function') applySettings({
+            wallpaper: wallpaperInp?.value,
+            theme: themeSel?.value,
+            transparency: transChk?.checked,
+            accent_color: accentInp?.value,
+            snap_enabled: snapChk?.checked,
+            taskbar_autohide: autoChk?.checked
+        });
     };
     [wallpaperInp, themeSel, transChk, accentInp, snapChk, autoChk].forEach(el => {
         if (el) el.addEventListener('change', save);

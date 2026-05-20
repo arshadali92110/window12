@@ -1,50 +1,54 @@
-// taskbar-pins.js – pin/unpin apps to taskbar, persistent
+// taskbar-pins.js – pinning apps to taskbar, persistence
 
-let pinnedApps = []; // array of app names
+let pinnedApps = [];
 
 async function loadPinnedApps() {
     try {
         const s = await api.get('/settings/');
         if (s.pinned_apps) {
             pinnedApps = JSON.parse(s.pinned_apps);
+        } else {
+            pinnedApps = ['explorer', 'browser', 'settings'];
         }
     } catch (e) {
-        pinnedApps = ['explorer', 'browser', 'settings']; // defaults
+        pinnedApps = ['explorer', 'browser', 'settings'];
     }
     refreshPinnedTaskbarIcons();
 }
 
 function savePinnedApps() {
-    api.put('/settings/', { pinned_apps: JSON.stringify(pinnedApps) }).catch(() => { });
+    queueSettingsUpdate({ pinned_apps: JSON.stringify(pinnedApps) });
 }
 
-// Show pinned icons in taskbar (left side or center, we'll use a dedicated container)
 function refreshPinnedTaskbarIcons() {
     const container = document.getElementById('pinned-apps');
     if (!container) return;
     container.innerHTML = '';
+
     pinnedApps.forEach(app => {
         const def = startMenuApps.find(a => a.app === app);
         if (!def) return;
+
         const btn = document.createElement('button');
         btn.className = 'taskbar-btn';
         btn.title = def.name;
-        btn.innerHTML = def.icon;
+        btn.textContent = def.icon;
         btn.addEventListener('click', () => openApp(app));
-        // right-click to unpin
+
+        // Right-click to unpin
         btn.addEventListener('contextmenu', (e) => {
             e.preventDefault();
-            if (confirm(`Unpin ${def.name} from taskbar?`)) {
+            if (confirm(`Unpin "${def.name}" from taskbar?`)) {
                 pinnedApps = pinnedApps.filter(a => a !== app);
                 savePinnedApps();
                 refreshPinnedTaskbarIcons();
             }
         });
+
         container.appendChild(btn);
     });
 }
 
-// Pin an app (called from start menu context or when installing)
 function pinApp(appName) {
     if (!pinnedApps.includes(appName)) {
         pinnedApps.push(appName);

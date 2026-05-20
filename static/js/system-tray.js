@@ -1,26 +1,28 @@
-// system-tray.js – volume & network interactive icons
+// system-tray.js – interactive volume & network tray icons
 
 let isMuted = false;
 
 function initSystemTray() {
     const volumeIcon = document.querySelector('.tray-icon[title="Volume"]');
     if (volumeIcon) {
+        volumeIcon.style.cursor = 'pointer';
         volumeIcon.addEventListener('click', () => {
             isMuted = !isMuted;
             volumeIcon.textContent = isMuted ? '🔇' : '🔊';
-            // Save mute state
-            api.put('/settings/', { volume_muted: isMuted }).catch(() => { });
+            api.put('/settings/', queueSettingsUpdate({ volume_muted: isMuted }));
+            showToast(isMuted ? 'Muted' : 'Unmuted', 'Volume changed');
         });
     }
-    // Network – just show a tooltip
+
     const networkIcon = document.querySelector('.tray-icon[title="Network"]');
     if (networkIcon) {
+        networkIcon.style.cursor = 'pointer';
         networkIcon.title = 'Network: Connected';
         networkIcon.addEventListener('click', () => {
-            alert('Network status: Connected');
+            alert('🌐 Network Status: Connected\nSignal: Excellent');
         });
     }
-    // Load mute state
+
     loadMuteState();
 }
 

@@ -53,14 +53,10 @@ async function saveWorkspaces() {
             isMinimized: w.isMinimized, isMaximized: w.isMaximized, zIndex: w.zIndex
         }))
     }));
-    try {
-        await api.put('/settings/', {
-            workspaces: JSON.stringify(data),
-            windows_layout: JSON.stringify(data[Win12.currentWorkspaceIndex]?.windows || [])
-        });
-    } catch (e) {
-        console.error('Failed to save workspaces', e);
-    }
+    queueSettingsUpdate({
+        workspaces: JSON.stringify(data),
+        windows_layout: JSON.stringify(data[Win12.currentWorkspaceIndex]?.windows || [])
+    });
 }
 
 function toggleTaskView() {

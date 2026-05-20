@@ -1,35 +1,46 @@
-// widgets.js – dynamic widgets data
+// widgets.js – dynamic live data for widget cards
 
 function initWidgets() {
     updateWeatherWidget();
     updateStocksWidget();
     updateCalendarWidget();
+
     // Refresh every 5 minutes
     setInterval(updateWeatherWidget, 300000);
     setInterval(updateStocksWidget, 300000);
+    setInterval(updateCalendarWidget, 60000);
 }
 
 function updateWeatherWidget() {
-    const tempEl = document.querySelector('.widget-weather .weather-temp');
-    const descEl = document.querySelector('.widget-weather .weather-desc');
-    if (!tempEl) return;
-    // Simulate real data
-    const temps = [68, 72, 75, 70, 78, 65, 80];
+    const tempEl = document.querySelector('.weather-temp');
+    const descEl = document.querySelector('.weather-desc');
+    const iconEl = document.querySelector('.weather-icon');
+    if (!tempEl || !descEl) return;
+
+    const temps = [68, 72, 75, 70, 78, 65, 80, 82, 69, 73];
     const conditions = ['Sunny', 'Partly Cloudy', 'Cloudy', 'Light Rain', 'Clear'];
+    const cities = ['New York', 'London', 'Tokyo', 'Dubai', 'Mumbai'];
+
     const randTemp = temps[Math.floor(Math.random() * temps.length)];
     const randCond = conditions[Math.floor(Math.random() * conditions.length)];
+    const randCity = cities[Math.floor(Math.random() * cities.length)];
+
     tempEl.textContent = randTemp + '°F';
-    descEl.textContent = randCond + ' · New York';
-    const iconEl = document.querySelector('.widget-weather .weather-icon');
+    descEl.textContent = randCond + ' · ' + randCity;
+
     if (iconEl) {
-        const icons = { 'Sunny': '☀️', 'Partly Cloudy': '⛅', 'Cloudy': '☁️', 'Light Rain': '🌧️', 'Clear': '🌙' };
+        const icons = {
+            'Sunny': '☀️', 'Partly Cloudy': '⛅', 'Cloudy': '☁️',
+            'Light Rain': '🌧️', 'Clear': '🌙'
+        };
         iconEl.textContent = icons[randCond] || '☀️';
     }
 }
 
 function updateStocksWidget() {
-    const stockEl = document.querySelector('.widget-stocks .stock-val');
+    const stockEl = document.querySelector('.stock-val');
     if (!stockEl) return;
+
     const change = (Math.random() * 4 - 1).toFixed(2);
     const sign = change >= 0 ? '▲' : '▼';
     const color = change >= 0 ? '#34d399' : '#ef4444';
@@ -37,9 +48,10 @@ function updateStocksWidget() {
 }
 
 function updateCalendarWidget() {
-    // Show today's date nicely
-    const calEl = document.querySelector('.widget-calendar .cal-text');
+    const calEl = document.querySelector('.cal-text');
     if (!calEl) return;
     const now = new Date();
-    calEl.textContent = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+    calEl.textContent = now.toLocaleDateString('en-US', {
+        weekday: 'long', month: 'long', day: 'numeric'
+    });
 }
