@@ -1,6 +1,6 @@
 // auth-ui.js – login/signup UI, token refresh, password toggle
 
-let currentUser = null;
+let currentUserX = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     setupAuthUI();
@@ -103,9 +103,9 @@ async function signupHandler(e) {
 async function validateTokenAndLogin() {
     try {
         const res = await api.get('/auth/me');
-        currentUser = res;
-        Win12.currentUser = res;
-        document.getElementById('user-display').textContent = currentUser.full_name;
+        currentUserX = res;
+        Win12.currentUserX = res;
+        document.getElementById('user-display').textContent = currentUserX.full_name;
         loginSuccess();
     } catch (e) {
         localStorage.removeItem('token');
@@ -115,9 +115,9 @@ async function validateTokenAndLogin() {
 }
 
 async function loadUserProfile() {
-    currentUser = await api.get('/auth/me');
-    Win12.currentUser = currentUser;
-    document.getElementById('user-display').textContent = currentUser.full_name;
+    currentUserX = await api.get('/auth/me');
+    Win12.currentUserX = currentUserX;
+    document.getElementById('user-display').textContent = currentUserX.full_name;
 }
 
 function loginSuccess() {

@@ -1,4 +1,4 @@
-// desktop.js – authentication, lock screen, boot, WebSocket, workspace restore
+// desktop.js – boot, clock, overlay, window manager setup, WebSocket, data loading
 
 let currentUser;
 
@@ -59,6 +59,7 @@ function updateClocks() {
 setInterval(updateClocks, 10000);
 updateClocks();
 
+// --- Non‑auth initialization (after DOM ready) ---
 document.addEventListener('DOMContentLoaded', () => {
     // Desktop right‑click context menu actions
     const newFolderBtn = document.querySelector('[data-action="new-folder"]');
@@ -86,87 +87,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('taskbar-apps')
     );
 });
-
-function showLockScreen() {
-    document.getElementById('lock-screen').classList.remove('hidden');
-    document.getElementById('login-box').style.display = 'none';
-}
-
-function toggleSignupForm() {
-    document.getElementById('login-form').style.display = 'none';
-    document.getElementById('signup-form').style.display = 'flex';
-}
-function toggleLoginForm() {
-    document.getElementById('signup-form').style.display = 'none';
-    document.getElementById('login-form').style.display = 'flex';
-}
-
-async function loginHandler(e) {
-    e.preventDefault();
-    const username = document.getElementById('login-username').value.trim();
-    const password = document.getElementById('login-password').value.trim();
-    if (!username || !password) return alert('Enter username and password');
-    const formData = new URLSearchParams();
-    formData.append('username', username);
-    formData.append('password', password);
-    try {
-        const res = await fetch('/auth/login', { method: 'POST', body: formData });
-        if (!res.ok) throw new Error('Invalid credentials');
-        const data = await res.json();
-        authToken = data.access_token;
-        localStorage.setItem('token', authToken);
-        if (data.refresh_token) localStorage.setItem('refresh_token', data.refresh_token);
-        await loadUserProfile();
-        loginSuccess();
-    } catch (err) {
-        alert('Login failed: ' + err.message);
-    }
-}
-
-async function signupHandler(e) {
-    e.preventDefault();
-    const username = document.getElementById('signup-username').value.trim();
-    const password = document.getElementById('signup-password').value.trim();
-    const full_name = document.getElementById('signup-fullname').value.trim();
-    if (!username || !password || !full_name) return alert('All fields are required');
-    try {
-        await api.post('/auth/signup', { username, password, full_name });
-        alert('Signup successful! You can now login.');
-        toggleLoginForm();
-        document.getElementById('signup-username').value = '';
-        document.getElementById('signup-password').value = '';
-        document.getElementById('signup-fullname').value = '';
-    } catch (err) {
-        alert('Signup failed: ' + err.message);
-    }
-}
-
-async function validateTokenAndLogin() {
-    try {
-        const res = await api.get('/auth/me');
-        currentUser = res;
-        Win12.currentUser = res;
-        document.getElementById('user-display').textContent = currentUser.full_name;
-        loginSuccess();
-    } catch (e) {
-        localStorage.removeItem('token');
-        authToken = null;
-        showLockScreen();
-    }
-}
-
-async function loadUserProfile() {
-    currentUser = await api.get('/auth/me');
-    Win12.currentUser = currentUser;
-    document.getElementById('user-display').textContent = currentUser.full_name;
-}
-
-function loginSuccess() {
-    document.getElementById('login-box').style.display = 'none';
-    if (typeof unlockSystem === 'function') unlockSystem();
-    connectWebSocket();
-    initBackendData();
-}
 
 // --- WebSocket ---
 function connectWebSocket() {
@@ -221,7 +141,7 @@ function refreshAllNotesWindows() {
     });
 }
 
-// --- Backend data ---
+// --- Backend data (called by auth-ui.js after login) ---
 async function initBackendData() {
     await restoreWorkspaces();
     loadFilesIntoExplorerWindows();
