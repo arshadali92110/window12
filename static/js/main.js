@@ -586,16 +586,47 @@ function updateTaskbarApps() {
         btn.title = win.title;
         const icons = { explorer: '📁', browser: '🌐', settings: '⚙️', notepad: '📝', recycle: '🗑️', calculator: '🧮', photos: '🖼️', music: '🎵', video: '🎬', store: '🛒', terminal: '💻', calendar: '📅', weather: '☁️' };
         btn.textContent = icons[win.appType] || '📄';
-        btn.addEventListener('click', (e) => {
+        btn.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
             e.stopPropagation();
-            if (win.isMinimized) restoreWindow(win.id);
-            else if (win.id === activeWindowId) minimizeWindow(win.id);
-            else bringToFront(win.id);
+            showRunningAppContextMenu(e.clientX, e.clientY, win.appType, win.title, win.id);
         });
         taskbarApps.appendChild(btn);
     });
 }
+function showRunningAppContextMenu(x, y, appType, appTitle, windowId) {
+    const existing = document.getElementById('running-context-menu');
+    if (existing) existing.remove();
 
+    const menu = document.createElement('div');
+    menu.id = 'running-context-menu';
+    menu.style.cssText = `position:fixed; left:${x}px; top:${y}px; background:rgba(30,30,50,0.95); backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,0.2); border-radius:8px; padding:4px 0; min-width:160px; z-index:9000;`;
+
+    const addItem = (text, action) => {
+        const item = document.createElement('div');
+        item.style.cssText = 'padding:8px 16px; cursor:pointer; color:#cbd5e1; font-size:13px;';
+        item.textContent = text;
+        item.addEventListener('mouseenter', () => item.style.background = 'rgba(255,255,255,0.1)');
+        item.addEventListener('mouseleave', () => item.style.background = 'transparent');
+        item.addEventListener('click', () => { action(); menu.remove(); });
+        menu.appendChild(item);
+    };
+
+    const isPinned = typeof pinnedApps !== 'undefined' && pinnedApps.includes(appType);
+    addItem(isPinned ? '📌 Unpin from taskbar' : '📌 Pin to taskbar', () => {
+        if (isPinned) unpinApp(appType);
+        else pinApp(appType);
+    });
+    addItem('✕ Close window', () => closeWindow(windowId));
+
+    document.body.appendChild(menu);
+    document.addEventListener('click', function close(e) {
+        if (!menu.contains(e.target)) {
+            menu.remove();
+            document.removeEventListener('click', close);
+        }
+    });
+}
 // ---------- Open application ----------
 function openApp(appType) {
     const configs = {
@@ -615,6 +646,20 @@ function openApp(appType) {
     };
     const c = configs[appType] || { title: appType.charAt(0).toUpperCase() + appType.slice(1), width: 600, height: 400 };
     createWindow(appType, c.title, c.width, c.height);
+}
+
+// openApp now accepts an optional options object
+function openApp(appType, options = {}) {
+    const config = appConfigs[appType] || {
+        title: appType.charAt(0).toUpperCase() + appType.slice(1),
+        width: 600, height: 400
+    };
+    const win = createWindow(appType, config.title, config.width, config.height);
+    // Attach file data to window
+    if (options.file) {
+        win.fileData = options.file;
+    }
+    return win;
 }
 
 // ---------- Load app-specific content from backend ----------
@@ -662,6 +707,16 @@ async function loadAppContent(win, container) {
         case 'assistant':
             new AIAssistant(container, win);
             break;
+
+        case 'explorer': loadFilesIntoExplorer(container); break;
+        case 'browser': new BrowserApp(container, win); break;
+        case 'settings': loadSettingsIntoWindow(container); break;
+        case 'notepad': loadNotesIntoWindow(container); break;
+        case 'gallery': new GalleryApp(container, win); break;
+        case 'music': new MusicApp(container, win); break;
+        case 'video_player': new VideoPlayer(container, win); break;
+        case 'code_editor': new CodeEditor(container, win); break;
+        case 'pdf_viewer': new PDFViewer(container, win); break;
         default:
             container.innerHTML = `<div style="text-align:center;padding:30px;">${win.title}</div>`;
     }
@@ -1112,6 +1167,10 @@ document.addEventListener('keydown', (e) => {
                 switchToWorkspace(num - 1);
                 e.preventDefault();
             }
+        }
+        if (e.ctrlKey && e.shiftKey && e.key === 'L') {
+            lockScreen();
+            e.preventDefault();
         }
     }
 });

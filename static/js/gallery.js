@@ -11,7 +11,16 @@ class GalleryApp {
         this.currentIndex = 0;
         this.slideshowTimer = null;
         this.initUI();
-        this.loadImages();
+
+        if (win.fileData) {
+            // Open a specific file immediately
+            this.loadImages().then(() => {
+                const idx = this.currentImages.findIndex(img => img.id === win.fileData.id);
+                if (idx >= 0) this.openPreview(idx);
+            });
+        } else {
+            this.loadImages();
+        }
     }
 
     initUI() {

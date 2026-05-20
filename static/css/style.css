@@ -1104,6 +1104,11 @@
 
    /* Login box redesign */
 #login-box {
+    position: fixed;                /* already fixed? Change to fixed */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9500;
     width: 340px;
     padding: 36px 28px 28px;
     background: rgba(15, 15, 30, 0.85);
@@ -1112,10 +1117,10 @@
     border-radius: 24px;
     box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
     display: flex;
-    flex-direction: column;
-    position: relative;
+    flex-direction: column; 
     color: #e2e8f0;
     z-index: 9500;   /* ADD THIS */
+
 }
 .login-avatar {
     width: 56px; height: 56px;
@@ -1131,6 +1136,7 @@
     font-weight: 600;
     margin-bottom: 20px;
 }
+
 #login-box input {
     width: 100%;
     padding: 12px 14px;
@@ -1178,6 +1184,7 @@
     cursor: pointer;
     transition: background 0.2s, transform 0.2s;
 }
+
 .login-arrow-btn:hover {
     background: #3b82f6;
     transform: scale(1.05);
@@ -1198,20 +1205,30 @@
 }
 .plus-signup-btn:hover {
     background: rgba(255, 255, 255, 0.2);
-}  
-#login-box button#show-signup,
-#login-box button#show-login {
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #cbd5e1;
-    font-size: 13px;
-    margin-bottom: 0;
 }
-#login-box button#show-signup:hover,
-#login-box button#show-login:hover {
-    background: rgba(255, 255, 255, 0.08);
+#show-signup-icon,
+#show-login-icon {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9600;   /* login box ke upar */
+    transition: background 0.2s;
 }
-
+#show-signup-icon:hover,
+#show-login-icon:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
 #lock-screen {
     z-index: 9000;
     cursor: pointer;
@@ -1219,6 +1236,20 @@
 #lock-screen.hidden {
     display: none;
 }
+#widgets-panel {
+    transform: translateX(110%);
+    transition: transform 0.3s ease;
+}
+#widgets-panel.open {
+    transform: translateX(0);
+}
+
+
+
+
+
+
+
 /* ===========================
    RESPONSIVE ADJUSTMENTS
    =========================== */

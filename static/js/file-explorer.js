@@ -45,10 +45,13 @@ function attachExplorerEvents(container, vfs, folderId) {
     });
     container.querySelectorAll('.explorer-file').forEach(el => {
         el.addEventListener('dblclick', () => {
-            if (el.dataset.type === 'folder') {
-                renderExplorerView(container, vfs, el.dataset.id);
+            const id = el.dataset.id;
+            const type = el.dataset.type;
+            if (type === 'folder') {
+                renderExplorerView(container, vfs, id);
             } else {
-                openFileInNotepad(el.dataset.id);
+                // Use global opener
+                openFileById(id);
             }
         });
         el.addEventListener('contextmenu', (e) => {

@@ -25,11 +25,17 @@ window.hideOverlay = hideOverlay;
 // --- Boot & Unlock ---
 function startBootSequence() {
     setTimeout(() => {
+        if (!Win12.isLocked) return;   // already unlocked, don't show lock screen
         document.getElementById('boot-screen').classList.add('hidden');
         document.getElementById('lock-screen').classList.remove('hidden');
-        Win12.isLocked = true;
     }, 2000);
 }
+
+function hideBootScreen() {
+    const bootScreen = document.getElementById('boot-screen');
+    if (bootScreen) bootScreen.classList.add('hidden');
+}
+window.hideBootScreen = hideBootScreen;
 
 function unlockSystem() {
     if (!Win12.isLocked) return;

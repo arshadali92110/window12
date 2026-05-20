@@ -2,6 +2,8 @@ from api.core.google_sheets_db import sheets_db_manager
 from api.core.repository import BaseRepository, SimpleCache
 from typing import List, Dict, Optional
 import uuid, datetime
+
+from api.utils.mime_detector import get_mime_from_extension
 from ..routers.websocket import broadcast_file_change
 
 cache = SimpleCache(ttl=5)  # files change often
@@ -24,19 +26,19 @@ class FileRepository(BaseRepository[Dict]):
 
     def create(self, user_id: str, item: Dict) -> Dict:
         now = datetime.datetime.utcnow().isoformat()
-        content = item.get("content", "")
-        
-        # Google Sheets cell limit: 50,000 characters
-        if len(content) > 50000:
-            raise ValueError("File content too large (max 50,000 characters). Use a smaller file or store a URL instead.")
-        
+        name = item.get("name", "")
+        extension = item.get("extension") or (name[name.rfind("."):].lower() if "." in name else "")
+        mime_type = item.get("mime_type") or get_mime_from_extension(name)
         file = {
             "id": item.get("id", str(uuid.uuid4())),
             "user_id": user_id,
-            "name": item["name"],
+            "name": name,
             "type": item["type"],
             "parent_id": item.get("parent_id", "root"),
-            "content": content,
+            "content": item.get("content", ""),
+            "extension": extension,
+            "mime_type": mime_type,
+            "size": str(len(item.get("content", ""))),
             "created_at": now,
             "updated_at": now
         }

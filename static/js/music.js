@@ -12,6 +12,9 @@ class MusicApp {
         this.playlists = [];
         this.initUI();
         this.loadPlaylists();
+        if (win.fileData) {
+            this.playFile(win.fileData.id);
+        }
     }
 
     initUI() {

@@ -5,7 +5,6 @@ let currentUserX = null;
 document.addEventListener('DOMContentLoaded', () => {
     setupAuthUI();
 
-    // Auto‑login if token exists
     if (authToken) {
         validateTokenAndLogin();
     } else {
@@ -25,9 +24,7 @@ function setupAuthUI() {
         });
     });
 
-    // Login button
     document.getElementById('login-btn').addEventListener('click', loginHandler);
-    // Signup button
     document.getElementById('signup-btn').addEventListener('click', signupHandler);
 
     // Plus icon → show signup form
@@ -82,7 +79,6 @@ async function signupHandler(e) {
     const password = document.getElementById('signup-password').value.trim();
     if (!email || !username || !fullName || !password) return alert('All fields are required');
     try {
-        // Send email along with signup data
         await api.post('/auth/signup', { username, password, full_name: fullName, email });
         alert('Signup successful! You can now login.');
         // Switch back to login form
@@ -90,7 +86,6 @@ async function signupHandler(e) {
         document.getElementById('login-form').style.display = 'flex';
         document.getElementById('show-login-icon').style.display = 'none';
         document.getElementById('show-signup-icon').style.display = 'flex';
-        // Clear fields
         document.getElementById('signup-email').value = '';
         document.getElementById('signup-username').value = '';
         document.getElementById('signup-fullname').value = '';
@@ -104,8 +99,11 @@ async function validateTokenAndLogin() {
     try {
         const res = await api.get('/auth/me');
         currentUserX = res;
-        Win12.currentUserX = res;
+        Win12.currentUser = res;           // important for other modules
         document.getElementById('user-display').textContent = currentUserX.full_name;
+        // Update welcome heading if login form is visible (first time)
+        const heading = document.getElementById('login-heading');
+        if (heading) heading.textContent = currentUserX.full_name;
         loginSuccess();
     } catch (e) {
         localStorage.removeItem('token');
@@ -116,12 +114,22 @@ async function validateTokenAndLogin() {
 
 async function loadUserProfile() {
     currentUserX = await api.get('/auth/me');
-    Win12.currentUserX = currentUserX;
+    Win12.currentUser = currentUserX;
     document.getElementById('user-display').textContent = currentUserX.full_name;
+    const heading = document.getElementById('login-heading');
+    if (heading) heading.textContent = currentUserX.full_name;  // future logins will show name
 }
 
 function loginSuccess() {
     document.getElementById('login-box').style.display = 'none';
+    // Hide boot screen immediately
+    if (typeof hideBootScreen === 'function') hideBootScreen();
+    // Hide plus icons
+    const plusBtn = document.getElementById('show-signup-icon');
+    const backBtn = document.getElementById('show-login-icon');
+    if (plusBtn) plusBtn.style.display = 'none';
+    if (backBtn) backBtn.style.display = 'none';
+    // Unlock
     if (typeof unlockSystem === 'function') unlockSystem();
     if (typeof connectWebSocket === 'function') connectWebSocket();
     if (typeof initBackendData === 'function') initBackendData();
@@ -130,4 +138,7 @@ function loginSuccess() {
 function showLockScreen() {
     document.getElementById('lock-screen').classList.remove('hidden');
     document.getElementById('login-box').style.display = 'none';
+    // Show plus button again
+    const plusBtn = document.getElementById('show-signup-icon');
+    if (plusBtn) plusBtn.style.display = 'flex';
 }

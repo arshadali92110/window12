@@ -14,9 +14,11 @@ class TokenResponse(BaseModel):
 
 class FileCreate(BaseModel):
     name: str
-    type: str  # "folder" or "file"
+    type: str
     parent_id: Optional[str] = "root"
     content: Optional[str] = ""
+    mime_type: Optional[str] = None
+    extension: Optional[str] = None
 
 class FileUpdate(BaseModel):
     name: Optional[str] = None

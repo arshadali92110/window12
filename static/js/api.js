@@ -29,21 +29,25 @@ const api = {
                         headers['Authorization'] = `Bearer ${authToken}`;
                         res = await fetch(API_BASE + url, { method, headers, body: body ? JSON.stringify(body) : null });
                     } else {
-                        // Refresh failed – force logout
+                        // Refresh failed – clear tokens and show lock screen (no reload)
                         authToken = null;
-                        localStorage.clear();
-                        window.location.reload();   // ← clean reload to lock screen
-                        return;
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('refresh_token');
+                        showLockScreen();
+                        throw new Error('Session expired');
                     }
                 } catch (e) {
                     authToken = null;
-                    localStorage.clear();
-                    window.location.reload();
-                    return;
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('refresh_token');
+                    showLockScreen();
+                    throw e;
                 }
             } else {
                 authToken = null;
                 localStorage.removeItem('token');
+                showLockScreen();
+                throw new Error('Not authenticated');
             }
             isRefreshing = false;
         }
